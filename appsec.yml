@@ -1,6 +1,16 @@
 version: 0.0
 os: linux
 
+files:
+  - source: /
+    destination: /home/ec2-user/aws-ci-cd
+
+permissions:
+  - object: /home/ec2-user/aws-ci-cd/stop_container.sh
+    mode: "0755"
+  - object: /home/ec2-user/aws-ci-cd/start_container.sh
+    mode: "0755"
+
 hooks:
   ApplicationStop:
     - location: stop_container.sh
@@ -10,3 +20,24 @@ hooks:
     - location: start_container.sh
       timeout: 300
       runas: root
+```
+
+The `files` block is still needed so CodeDeploy copies the scripts themselves onto the EC2 instance so they can be executed. Here's the full flow:
+
+---
+
+**What happens during deployment:**
+```
+GitHub Repo
+    │
+    ▼
+CodeDeploy copies scripts to /home/ec2-user/aws-ci-cd/
+    │
+    ▼
+ApplicationStop hook runs stop_container.sh
+→ stops & removes old flask-app container
+    │
+    ▼
+AfterInstall hook runs start_container.sh
+→ pulls latest image from Docker Hub
+→ starts new flask-app container on port 80
