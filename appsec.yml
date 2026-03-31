@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ec2-user/aws-ci-cd
+    destination: /home/ubuntu/aws-ci-cd 
 
 permissions:
   - object: /home/ec2-user/aws-ci-cd/stop_container.sh
